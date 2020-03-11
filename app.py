@@ -1,42 +1,28 @@
 # coding=utf-8
-import pandas as pd
-import pickle
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import load_model
-import numpy as np
-
-# from sklearn.feature_extraction.text import CountVectorizer
-# from sklearn.naive_bayes import MultinomialNB
-# from sklearn.externals import joblib
-import nltk
-from nltk.corpus import wordnet as WN
-from nltk import word_tokenize
-from nltk.corpus import stopwords
-from sklearn.datasets import fetch_20newsgroups
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.naive_bayes import MultinomialNB
-import pandas as pd
-from bs4 import BeautifulSoup
 import pickle
 import os
 import requests
 import json
 import sys
+from keras.preprocessing.sequence import pad_sequences
+from keras.models import load_model
+import nltk
+from nltk.corpus import wordnet as WN
+from nltk import word_tokenize
+from nltk.corpus import stopwords
 
+
+GRAMMAR_API_ENDPOINT = 'https://virtualwritingtutor.com/API/checkgrammar.php'
+GRAMMAR_API_KEY = 'ab4d4823-8b99-11e8-a062-00163e747eab'
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-
-stop_words_en = set(stopwords.words('english'))
-
+STOP_WORDS_EN = set(stopwords.words('english'))
 
 def get_num_words(text_to_process):
     tokens = word_tokenize(text_to_process)
     return int(len(tokens))
 
-
 def tokens(sent):
     return nltk.word_tokenize(sent)
-
 
 def num_spelling_errors(response):
     num_errors = 0
@@ -44,7 +30,7 @@ def num_spelling_errors(response):
     for i in tokens(response):
         strip = i.rstrip()
         if not WN.synsets(strip):
-            if strip in stop_words_en:    # <--- Check whether it's in stopword list
+            if strip in STOP_WORDS_EN:    # <--- Check whether it's in stopword list
                 #print("No mistakes :" + i)
                 pass
             else:
@@ -54,11 +40,6 @@ def num_spelling_errors(response):
             pass
             #print("No mistakes :" + i)
     return num_errors
-
-
-GRAMMAR_API_ENDPOINT = 'https://virtualwritingtutor.com/API/checkgrammar.php'
-GRAMMAR_API_KEY = 'ab4d4823-8b99-11e8-a062-00163e747eab'
-
 
 def get_grammar(badge_response):
     try:
@@ -104,7 +85,6 @@ def main():
         'grammar': get_grammar(text_input)
     }
     print(json.dumps(result))
-
 
 if __name__ == '__main__':
     main()
